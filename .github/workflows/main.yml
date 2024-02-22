@@ -18,13 +18,9 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install Python dependencies and PySpark
+      - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
-
-      - name: List installed Python packages
-        run: |
-          pip list
 
       - name: Set up Java
         uses: actions/setup-java@v2
@@ -38,16 +34,12 @@ jobs:
           echo "SPARK_HOME=/tmp/spark-3.1.1-bin-hadoop2.7" >> $GITHUB_ENV
           echo "$SPARK_HOME/bin" >> $GITHUB_PATH
 
-      - name: Test PySpark Setup
-        run: |
-          python -c "from pyspark.sql import SparkSession; spark = SparkSession.builder.master('local[2]').appName('TestPySpark').getOrCreate(); print(spark.version); spark.stop()"
-
-      - name: Run main.py (optional for CI)
+      - name: Run main.py using spark-submit
         env:
+          SPARK_HOME: /tmp/spark-3.1.1-bin-hadoop2.7
           PYTHONPATH: ${{ github.workspace }}/src
-          CI: true # Ensuring main.py recognizes it's running in a CI environment
         run: |
-          python src/main.py
+          $SPARK_HOME/bin/spark-submit --master local[2] --name "MovieLens Data Processing" src/main.py
 
       - name: Run PySpark tests
         env:
