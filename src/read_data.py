@@ -5,16 +5,15 @@ from pyspark.sql import SparkSession, Window
 from pyspark.sql.functions import col, max as max_, min as min_, avg, rank
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
 
-# Environment variables for configuration
+# Set up environment variables for paths
 DATA_PATH = os.getenv("DATA_PATH", "data/")
 OUTPUT_PATH = os.getenv("OUTPUT_PATH", "output/")
 LOG_DIR = os.getenv("LOG_DIR", "logs/")
 VERSIONING = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
-# Ensure directories exist
-for dir in [LOG_DIR, OUTPUT_PATH]:
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+# Ensure the logs directory exists
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 # Configure logging
 logging.basicConfig(
@@ -34,19 +33,19 @@ def transform_data(movies_df, ratings_df):
             max_("rating").alias("max_rating"),
             min_("rating").alias("min_rating"),
             avg("rating").alias("avg_rating")
-        )
+        ).cache()
         
         # Join movies with their ratings statistics
-        movie_ratings = movies_df.join(ratings_stats, "movieId")
+        movie_ratings = movies_df.join(ratings_stats, on="movieId")
         
-        # Rank the movies for each user and get the top 3
+        # Define window spec for ranking movies per user
         windowSpec = Window.partitionBy("userId").orderBy(col("rating").desc())
-        top_movies = ratings_df.withColumn("rank", rank().over(windowSpec)).filter(col("rank") <= 3)
+        top_movies = ratings_df.withColumn("rank", rank().over(windowSpec)).where(col("rank") <= 3)
         
         logging.info("Data transformation completed successfully.")
         return movie_ratings, top_movies
     except Exception as e:
-        logging.error("Data transformation failed.", exc_info=True)
+        logging.error("Error during data transformation: %s", e, exc_info=True)
         raise
 
 if __name__ == "__main__":
@@ -54,7 +53,7 @@ if __name__ == "__main__":
         spark = SparkSession.builder.appName("MovieLens Data Processing").getOrCreate()
         logging.info("Spark session started.")
         
-        # Define schemas for movies and ratings
+        # Define schema for movies and ratings
         movieSchema = StructType([
             StructField("movieId", IntegerType(), True),
             StructField("title", StringType(), True),
@@ -68,26 +67,24 @@ if __name__ == "__main__":
             StructField("timestamp", IntegerType(), True),
         ])
         
-        # Read the movies and ratings data
+        # Load data into DataFrames
         movies_df = spark.read.option("delimiter", "::").schema(movieSchema).csv(os.path.join(DATA_PATH, "movies.dat"))
         ratings_df = spark.read.option("delimiter", "::").schema(ratingSchema).csv(os.path.join(DATA_PATH, "ratings.dat"))
         
-        logging.info("Data read successfully.")
-        
-        # Transform the data
+        # Perform data transformation
         movie_ratings_df, top_movies_df = transform_data(movies_df, ratings_df)
         
-        # Versioned output directory
+        # Define output directories with versioning
         movie_ratings_output = os.path.join(OUTPUT_PATH, f"movie_ratings_{VERSIONING}")
         top_movies_output = os.path.join(OUTPUT_PATH, f"top_movies_{VERSIONING}")
-
-        # Writing data with versioning
+        
+        # Write the transformed data to output
         movie_ratings_df.write.mode("overwrite").parquet(movie_ratings_output)
         top_movies_df.write.mode("overwrite").parquet(top_movies_output)
-        logging.info(f"Data written to {movie_ratings_output} and {top_movies_output}.")
-
+        logging.info("Data written to output successfully.")
+        
     except Exception as e:
-        logging.error("An error occurred in the main block.", exc_info=True)
+        logging.error("An error occurred in the main block: %s", e, exc_info=True)
     finally:
         spark.stop()
         logging.info("Spark session stopped.")
