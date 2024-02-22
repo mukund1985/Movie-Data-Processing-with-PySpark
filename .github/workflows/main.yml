@@ -21,7 +21,10 @@ jobs:
       - name: Install Python dependencies and PySpark
         run: |
           pip install -r requirements.txt
-          pip install pyspark==3.1.1  # Adjust this to match the PySpark version you need
+
+      - name: List installed Python packages
+        run: |
+          pip list
 
       - name: Set up Java
         uses: actions/setup-java@v2
@@ -34,6 +37,10 @@ jobs:
           wget -qO- "https://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop2.7.tgz" | tar -xz -C /tmp/
           echo "SPARK_HOME=/tmp/spark-3.1.1-bin-hadoop2.7" >> $GITHUB_ENV
           echo "$SPARK_HOME/bin" >> $GITHUB_PATH
+
+      - name: Test PySpark Setup
+        run: |
+          python -c "from pyspark.sql import SparkSession; spark = SparkSession.builder.master('local[2]').appName('TestPySpark').getOrCreate(); print(spark.version); spark.stop()"
 
       - name: Run main.py (optional for CI)
         env:
