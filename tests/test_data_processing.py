@@ -2,13 +2,12 @@ import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
 from pyspark.sql.functions import col
-import sys
-import os
-from datetime import datetime
-from read_data import transform_data
+from data_processing import transform_data
 from logging_config import get_logger
 
-# Adjust the path to include the 'src' directory where 'logging_config.py' is located
+# Adjust the path to include the 'src' directory where 'data_processing.py' is located
+import os
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 # Setup logging for this test module
@@ -16,6 +15,9 @@ logger = get_logger('test_data_processing')
 
 @pytest.fixture(scope="session")
 def spark():
+    """
+    Pytest fixture for creating a Spark session.
+    """
     spark_session = SparkSession.builder.master("local[2]").appName("TestSession").getOrCreate()
     logger.info("Spark session for testing started.")
     yield spark_session
@@ -23,6 +25,9 @@ def spark():
     logger.info("Spark session for testing stopped.")
 
 def test_transform_data(spark):
+    """
+    Test the transform_data function for correctness.
+    """
     # Define schema for movies and ratings
     movie_schema = StructType([
         StructField("movieId", IntegerType(), True),
@@ -49,7 +54,7 @@ def test_transform_data(spark):
     movies_df = spark.createDataFrame(movie_data, schema=movie_schema)
     ratings_df = spark.createDataFrame(rating_data, schema=rating_schema)
 
-    # Perform transformation using the function from 'read_data.py'
+    # Perform transformation using the function from 'data_processing.py'
     movie_ratings_df, top_movies_df = transform_data(movies_df, ratings_df)
 
     # Assertions to validate the transformation logic
@@ -59,5 +64,3 @@ def test_transform_data(spark):
         "User 1 should have 2 top movies"
     
     logger.info("Test for transform_data function passed.")
-
-# Note that you can add more test functions as needed.

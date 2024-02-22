@@ -3,7 +3,6 @@ import sys
 from datetime import datetime
 from pyspark.sql import SparkSession, Window
 from pyspark.sql.functions import col, max as max_, min as min_, avg, rank
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
 
 # Adjusting the path insert to avoid E501
 path_to_append = '/Users/mukundpandey/git_repo/newday_de_task/src'
@@ -22,19 +21,19 @@ def transform_data(movies_df, ratings_df):
     try:
         logger.info("Starting data transformation.")
         
-        # Adjusting the aggregation to fit within the line length
+        # Aggregate calculations for ratings
         ratings_stats = ratings_df.groupBy("movieId").agg(
             max_("rating").alias("max_rating"),
             min_("rating").alias("min_rating"),
             avg("rating").alias("avg_rating")
         )
         
+        # Join movies with their ratings statistics
         movie_ratings = movies_df.join(ratings_stats, "movieId")
         
+        # Ranking movies for each user
         window_spec = Window.partitionBy("userId").orderBy(col("rating").desc())
-        top_movies = ratings_df.withColumn(
-            "rank", rank().over(window_spec)
-        ).filter(col("rank") <= 3)
+        top_movies = ratings_df.withColumn("rank", rank().over(window_spec)).filter(col("rank") <= 3)
         
         logger.info("Data transformation completed successfully.")
         return movie_ratings, top_movies
@@ -43,40 +42,45 @@ def transform_data(movies_df, ratings_df):
         raise
 
 if __name__ == "__main__":
-    spark = None
+    spark = SparkSession.builder.appName("MovieLens Data Processing").getOrCreate()
+    logger.info("Spark session started.")
+    
     try:
-        spark = SparkSession.builder.appName("MovieLens Data Processing").getOrCreate()
-        logger.info("Spark session started.")
-        
-        # Defining schema inline to reduce line length
-        movie_schema = StructType([
-            StructField("movieId", IntegerType(), True),
-            StructField("title", StringType(), True),
-            StructField("genres", StringType(), True),
-        ])
-        
-        rating_schema = StructType([
-            StructField("userId", IntegerType(), True),
-            StructField("movieId", IntegerType(), True),
-            StructField("rating", FloatType(), True),
-            StructField("timestamp", IntegerType(), True),
-        ])
-        
-        # Adjusting read methods to fit within the line length
-        movies_df = spark.read.option("delimiter", "::").schema(movie_schema)\
-            .csv(os.path.join(DATA_PATH, "movies.dat"))
-        ratings_df = spark.read.option("delimiter", "::").schema(rating_schema)\
-            .csv(os.path.join(DATA_PATH, "ratings.dat"))
+        # Reading movies data
+        movies_df = spark.read.option("delimiter", "::").csv(
+            os.path.join(DATA_PATH, "movies.dat"),
+            schema="movieId INT, title STRING, genres STRING"
+        )
+        # Reading ratings data
+        ratings_df = spark.read.option("delimiter", "::").csv(
+            os.path.join(DATA_PATH, "ratings.dat"),
+            schema="userId INT, movieId INT, rating FLOAT, timestamp LONG"
+        )
         
         logger.info("Data read successfully.")
         
+        # Debugging schema and data
+        print("Movies DataFrame Schema:")
+        movies_df.printSchema()
+        print("Movies DataFrame Sample:")
+        movies_df.show(5, truncate=False)
+
+        print("Ratings DataFrame Schema:")
+        ratings_df.printSchema()
+        print("Ratings DataFrame Sample:")
+        ratings_df.show(5, truncate=False)
+        
+        # Proceed with transformation
         movie_ratings_df, top_movies_df = transform_data(movies_df, ratings_df)
         
+        # Preparing output paths
         movie_ratings_output = os.path.join(OUTPUT_PATH, f"movie_ratings_{VERSIONING}")
         top_movies_output = os.path.join(OUTPUT_PATH, f"top_movies_{VERSIONING}")
         
+        # Writing the transformed data to parquet files
         movie_ratings_df.write.mode("overwrite").parquet(movie_ratings_output)
         top_movies_df.write.mode("overwrite").parquet(top_movies_output)
+        
         logger.info(f"Data written to {movie_ratings_output} and {top_movies_output}.")
     except Exception:
         logger.error("An error occurred in the main block.", exc_info=True)
