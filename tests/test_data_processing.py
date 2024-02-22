@@ -9,8 +9,12 @@ from pyspark.sql.functions import col
 
 # Setup logging
 log_filename = f"test_data_processing_{datetime.now().strftime('%Y%m%d%H%M%S')}.log"
+log_file_path = os.path.join('logs', log_filename)
+
+# Remove the StreamHandler to prevent pytest from capturing the log output
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler(os.path.join('logs', log_filename)), logging.StreamHandler()])
+                    handlers=[logging.FileHandler(log_file_path)])
+
 
 # Assuming 'src' is a sibling directory to 'tests', we'll add the parent directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
