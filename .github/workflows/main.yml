@@ -43,6 +43,6 @@ jobs:
 
       - name: Run PySpark tests
         env:
-          PYTHONPATH: ${{ github.workspace }}/src
+          PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/tests
         run: |
           pytest tests/
