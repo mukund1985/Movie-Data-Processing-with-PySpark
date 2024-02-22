@@ -1,16 +1,20 @@
 import os
+import sys
+sys.path.insert(0, '/Users/mukundpandey/git_repo/newday_de_task/src')
 from datetime import datetime
 from pyspark.sql import SparkSession, Window
 from pyspark.sql.functions import col, max as max_, min as min_, avg, rank
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
-from src.logging_config import setup_logging
+from logging_config import get_logger
+
 
 # Set up logging
-logger = setup_logging('data_processing')
+logger = get_logger('data_processing')
 
 # Environment variables for configuration
 DATA_PATH = os.getenv("DATA_PATH", "data/")
 OUTPUT_PATH = os.getenv("OUTPUT_PATH", "output/")
+VERSIONING = datetime.now().strftime("%Y%m%d%H%M%S")
 
 def transform_data(movies_df, ratings_df):
     try:

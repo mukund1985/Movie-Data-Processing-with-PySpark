@@ -2,13 +2,17 @@ import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
 from pyspark.sql.functions import col
-from datetime import datetime
+import sys
 import os
-from src.logging_config import setup_logging
-from src.read_data import transform_data  # Make sure this is correctly imported
+from datetime import datetime
+from read_data import transform_data
+from logging_config import get_logger
 
-# Initialize logger for testing
-logger = setup_logging('test_data_processing')
+# Adjust the path to include the 'src' directory where 'logging_config.py' is located
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+# Setup logging for this test module
+logger = get_logger('test_data_processing')
 
 @pytest.fixture(scope="session")
 def spark():
@@ -19,14 +23,13 @@ def spark():
     logger.info("Spark session for testing stopped.")
 
 def test_transform_data(spark):
-    logger.info("Testing the transform_data function.")
-
     # Define schema for movies and ratings
     movie_schema = StructType([
         StructField("movieId", IntegerType(), True),
         StructField("title", StringType(), True),
         StructField("genres", StringType(), True),
     ])
+    
     rating_schema = StructType([
         StructField("userId", IntegerType(), True),
         StructField("movieId", IntegerType(), True),
@@ -34,23 +37,27 @@ def test_transform_data(spark):
         StructField("timestamp", IntegerType(), True),
     ])
 
-    # Define sample movie data
+    # Define sample data
     movie_data = [(1, "Toy Story (1995)", "Adventure|Animation|Children|Comedy|Fantasy"),
                   (2, "Jumanji (1995)", "Adventure|Children|Fantasy")]
-    # Define sample rating data
     rating_data = [(1, 1, 5.0, 964982703),
                    (1, 2, 3.0, 964982703),
                    (2, 1, 2.0, 964982703),
                    (2, 2, 3.0, 964982703)]
 
-    # Create DataFrame for movies and ratings
+    # Create DataFrames
     movies_df = spark.createDataFrame(movie_data, schema=movie_schema)
     ratings_df = spark.createDataFrame(rating_data, schema=rating_schema)
 
-    # Call the transform_data function from read_data.py
+    # Perform transformation using the function from 'read_data.py'
     movie_ratings_df, top_movies_df = transform_data(movies_df, ratings_df)
 
-    # Assert statements to validate the transformation
-    assert movie_ratings_df.filter(col("movieId") == 1).select("avg_rating").collect()[0][0] == 3.5, "Avg rating for MovieId 1 should be 3.5"
-    assert top_movies_df.filter(col("userId") == 1).count() == 2, "User 1 should have 2 top movies"
+    # Assertions to validate the transformation logic
+    assert movie_ratings_df.filter(col("movieId") == 1).select("avg_rating").collect()[0][0] == 3.5, \
+        "Avg rating for MovieId 1 should be 3.5"
+    assert top_movies_df.filter(col("userId") == 1).count() == 2, \
+        "User 1 should have 2 top movies"
+    
     logger.info("Test for transform_data function passed.")
+
+# Note that you can add more test functions as needed.
