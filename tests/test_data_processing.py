@@ -4,35 +4,35 @@ from pyspark.sql.types import StructType, StructField, IntegerType, StringType, 
 from pyspark.sql.functions import col
 import sys
 import os
-sys.path.append(os.path.abspath('/Users/mukundpandey/git_repo/newday_de_task/src'))
-from read_data import transform_data
 
+# Adjust the import path dynamically
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
-
+from src.read_data import transform_data
 
 @pytest.fixture(scope="session")
 def spark():
-    return SparkSession.builder.master("local[2]").appName("TestSession").getOrCreate()
+    spark_session = SparkSession.builder.master("local[2]").appName("TestSession").getOrCreate()
+    yield spark_session
+    spark_session.stop()
 
 def test_transform_data(spark):
-    # Define sample movie data
+    # Define sample movie and rating data
     movie_data = [(1, "Toy Story (1995)", "Adventure|Animation|Children|Comedy|Fantasy"),
                   (2, "Jumanji (1995)", "Adventure|Children|Fantasy")]
-
-    # Define sample rating data
     rating_data = [(1, 1, 5.0, 964982703),
                    (1, 2, 3.0, 964982703),
                    (2, 1, 2.0, 964982703),
                    (2, 2, 3.0, 964982703)]
 
-    # Define schema for movies
+    # Define schema for movies and ratings
     movie_schema = StructType([
         StructField("movieId", IntegerType(), True),
         StructField("title", StringType(), True),
         StructField("genres", StringType(), True),
     ])
-    
-    # Define schema for ratings
     rating_schema = StructType([
         StructField("userId", IntegerType(), True),
         StructField("movieId", IntegerType(), True),
