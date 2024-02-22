@@ -2,12 +2,15 @@ import sys
 import os
 import pytest
 import logging
+from datetime import datetime  # This import is necessary for datetime usage
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
 from pyspark.sql.functions import col
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+log_filename = f"test_data_processing_{datetime.now().strftime('%Y%m%d%H%M%S')}.log"
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler(os.path.join('logs', log_filename)), logging.StreamHandler()])
 
 # Assuming 'src' is a sibling directory to 'tests', we'll add the parent directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
