@@ -1,0 +1,40 @@
+name: CI for Spark Project
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8' 
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'  
+        distribution: 'adopt'
+
+    - name: Set up Apache Spark
+      run: |
+        wget -qO- "https://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop2.7.tgz" | tar -xz -C /tmp/
+        echo "SPARK_HOME=/tmp/spark-3.1.1-bin-hadoop2.7" >> $GITHUB_ENV
+        echo "$SPARK_HOME/bin" >> $GITHUB_PATH
+
+    - name: Run PySpark tests
+      run: |
+        # Replace with your command to run tests, e.g., using pytest
+        pytest tests/
