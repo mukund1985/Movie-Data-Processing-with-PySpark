@@ -8,8 +8,6 @@ This project demonstrates data processing tasks using PySpark for movie data ana
 - [Usage](#usage)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Installation
 
@@ -26,19 +24,19 @@ This project demonstrates data processing tasks using PySpark for movie data ana
 pip install -r requirements.txt
 ```
 
-3. Usage
+## Usage
 
-   - Ensure that you have a Spark environment set up.
-   - Prepare your movie and rating data files (`movies.dat` and `ratings.dat`) and place them in the `data` directory.
-   - Run the `read_data.py` script to process the data:
+1.  Ensure that you have a Spark environment set up.
+2.  Prepare your movie and rating data files (`movies.dat` and `ratings.dat`) and place them in the `data` directory.
+3.  Run the `read_data.py` script to process the data:
 
-   ```bash
-   python read_data.py
-   ```
+    ```bash
+    python read_data.py
+    ```
 
-4. Check the `output` directory for the processed data files (`movie_ratings` and `top_movies`).
+4.  Check the `output` directory for the processed data files (`movie_ratings` and `top_movies`).
 
-5. Project Structure
+## Project Structure
 
 ```
 newday_de_task/
@@ -63,7 +61,7 @@ newday_de_task/
 
 ```
 
-6. Testing
+## Testing
 
 This project includes unit tests and integration tests using pytest. To run the tests:
 
