@@ -1,0 +1,3 @@
+2024-02-23 03:00:59,141 [INFO] Attempting to read Parquet file: output/movie_ratings_20240223025843/part-00000-de35fb13-365d-4749-ba6a-9136518dcf0b-c000.snappy.parquet
+2024-02-23 03:01:01,230 [INFO] Displayed Parquet file contents successfully.
+2024-02-23 03:01:01,581 [INFO] Spark session stopped.

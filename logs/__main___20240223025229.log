@@ -1,0 +1,6 @@
+2024-02-23 02:52:29,886 [INFO] Reading data from data/movies.dat
+2024-02-23 02:52:30,589 [INFO] Reading data from data/ratings.dat
+2024-02-23 02:52:30,704 [INFO] Writing data to output/movie_ratings_20240223025229
+2024-02-23 02:52:32,905 [INFO] Writing data to output/top_movies_20240223025229
+2024-02-23 02:52:34,016 [INFO] Data processing and writing completed successfully.
+2024-02-23 02:52:34,322 [INFO] Spark session has been stopped.
