@@ -1,14 +1,11 @@
-# Continuous Integration for Spark Project
 name: CI for Spark Project
 
-# Triggering the workflow on push events to the main branch and pull requests targeting the main branch
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-# Job to build and test the Spark project
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -24,21 +21,17 @@ jobs:
         with:
           python-version: '3.8'
 
+      # Step to set environment variables for PySpark and PYTHONPATH
+      - name: Set environment variables
+        run: |
+          echo "PYSPARK_PYTHON=python3.8" >> $GITHUB_ENV
+          echo "PYSPARK_DRIVER_PYTHON=python3.8" >> $GITHUB_ENV
+          echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+
       # Step to install Python dependencies
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
-
-      # Step to install PySpark
-      - name: Install PySpark
-        run: |
-          pip install pyspark
-
-      # Step to set environment variables for PySpark
-      - name: Set environment variables for PySpark
-        run: |
-          echo "PYSPARK_PYTHON=python3.8" >> $GITHUB_ENV
-          echo "PYSPARK_DRIVER_PYTHON=python3.8" >> $GITHUB_ENV
 
       # Step to set up Java environment
       - name: Set up Java
@@ -58,7 +51,6 @@ jobs:
       - name: Run main.py using spark-submit
         env:
           SPARK_HOME: /tmp/spark-3.1.1-bin-hadoop2.7
-          PYTHONPATH: ${{ github.workspace }}/src
         run: |
           $SPARK_HOME/bin/spark-submit --master local[2] --name "MovieLens Data Processing" src/main.py
 
@@ -69,15 +61,13 @@ jobs:
         run: |
           pytest tests/
 
-      # Step to print out PYTHONPATH
-      - name: Print PYTHONPATH
+      # Step to set PYTHONPATH for check_parquet.py script
+      - name: Set PYTHONPATH for check_parquet.py
         run: |
           export PYTHONPATH="${{ github.workspace }}/src:${{ github.workspace }}/utils"
-          echo "PYTHONPATH: $PYTHONPATH"
 
       # Step to run check_parquet.py script and display logs
       - name: Run check_parquet.py
         run: |
-          export PYTHONPATH="${{ github.workspace }}/src:${{ github.workspace }}/utils"
           /opt/hostedtoolcache/Python/3.8.18/x64/bin/python3 utils/check_parquet.py output/movie_ratings_20240223025843/part-00000-de35fb13-365d-4749-ba6a-9136518dcf0b-c000.snappy.parquet > check_parquet_log.txt
           cat check_parquet_log.txt
