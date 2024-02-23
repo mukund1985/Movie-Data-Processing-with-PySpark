@@ -8,6 +8,8 @@ This project demonstrates data processing tasks using PySpark for movie data ana
 - [Usage](#usage)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
+- [Logging](#logging)
+- [Continuous Integration and Deployment (CI/CD)](#continuous-integration-and-deployment-cicd)
 
 ## Installation
 
@@ -15,7 +17,6 @@ This project demonstrates data processing tasks using PySpark for movie data ana
 
    ```bash
    git clone https://github.com/your_username/newday_de_task.git
-
    ```
 
 2. Install the required dependencies:
@@ -44,18 +45,6 @@ pip install -r requirements.txt
 
    Replace `<name_of_your_parquet_file>` with the actual name of the Parquet file you wish to check.
 
-## Logging
-
-This project uses logging to track the execution of data processing scripts. Log files are generated for each run and can be found in the `logs/` directory. Here's how the logging is structured:
-
-- `main_<timestamp>.log`: Logs from the main script execution.
-- `data_processing_<timestamp>.log`: Logs from the data processing tasks.
-- `test_data_processing_<timestamp>.log`: Logs from running the test cases.
-
-The `<timestamp>` in the filenames will help you identify the logs for each specific execution. You can review these logs to understand the flow of the data processing, monitor for any issues, and debug if necessary.
-
-To configure logging levels or change the format of the log messages, you can modify the `src/logging_config.py` script.
-
 ## Project Structure
 
 ```
@@ -80,9 +69,6 @@ newday_de_task/
 ├── .gitignore # Git ignore file
 ├── README.md # Project README file
 └── requirements.txt # Project dependencies
-
-
-
 ```
 
 ## Testing
@@ -92,6 +78,18 @@ This project includes unit tests and integration tests using pytest. To run the 
 ```
 pytest tests
 ```
+
+## Logging
+
+This project uses logging to track the execution of data processing scripts. Log files are generated for each run and can be found in the `logs/` directory. Here's how the logging is structured:
+
+- `main_<timestamp>.log`: Logs from the main script execution.
+- `data_processing_<timestamp>.log`: Logs from the data processing tasks.
+- `test_data_processing_<timestamp>.log`: Logs from running the test cases.
+
+The `<timestamp>` in the filenames will help you identify the logs for each specific execution. You can review these logs to understand the flow of the data processing, monitor for any issues, and debug if necessary.
+
+To configure logging levels or change the format of the log messages, you can modify the `src/logging_config.py` script.
 
 ## Continuous Integration and Deployment (CI/CD)
 
