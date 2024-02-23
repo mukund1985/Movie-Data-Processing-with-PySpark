@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 import sys
 import os
-from ..src.logging_config import get_logger
+from src.logging_config import get_logger
 
 # Function to get the path for the log file
 def get_log_file_path(data_type):
