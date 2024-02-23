@@ -40,7 +40,11 @@ pip install -r requirements.txt
 5. To verify the integrity of the generated Parquet files, run the `check_parquet.py` script:
 
    ```bash
-   python utils/check_parquet.py --file output/<name_of_your_parquet_file>
+   python utils/check_parquet.py output/<name_of_your_parquet_file>
+   ```
+
+   ```bash
+   python utils/check_parquet.py output/movie_ratings_20240223025843/part-00000-de35fb13-365d-4749-ba6a-9136518dcf0b-c000.snappy.parquet
    ```
 
    Replace `<name_of_your_parquet_file>` with the actual name of the Parquet file you wish to check.

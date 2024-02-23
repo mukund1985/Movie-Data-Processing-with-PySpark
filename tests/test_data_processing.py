@@ -10,7 +10,7 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-# Setup logging for this test module
+# Setting up logging for this test module
 logger = get_logger('test_data_processing')
 
 @pytest.fixture(scope="session")

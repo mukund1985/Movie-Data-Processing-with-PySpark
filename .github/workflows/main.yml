@@ -1,44 +1,55 @@
+# Continuous Integration for Spark Project
 name: CI for Spark Project
 
+# Triggering the workflow on push events to the main branch and pull requests targeting the main branch
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+# Job to build and test the Spark project
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      # Step to checkout the source code
+      - name: Checkout source code
+        uses: actions/checkout@v2
 
+      # Step to set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
 
+      # Step to set environment variables for PySpark
       - name: Set environment variables for PySpark
         run: |
           echo "PYSPARK_PYTHON=python3.8" >> $GITHUB_ENV
           echo "PYSPARK_DRIVER_PYTHON=python3.8" >> $GITHUB_ENV
 
+      # Step to install Python dependencies
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
 
+      # Step to set up Java environment
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
 
+      # Step to set up Apache Spark
       - name: Set up Apache Spark
         run: |
           wget -qO- "https://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop2.7.tgz" | tar -xz -C /tmp/
           echo "SPARK_HOME=/tmp/spark-3.1.1-bin-hadoop2.7" >> $GITHUB_ENV
           echo "$SPARK_HOME/bin" >> $GITHUB_PATH
 
+      # Step to run main.py using spark-submit
       - name: Run main.py using spark-submit
         env:
           SPARK_HOME: /tmp/spark-3.1.1-bin-hadoop2.7
@@ -46,6 +57,7 @@ jobs:
         run: |
           $SPARK_HOME/bin/spark-submit --master local[2] --name "MovieLens Data Processing" src/main.py
 
+      # Step to run PySpark tests
       - name: Run PySpark tests
         env:
           PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/tests

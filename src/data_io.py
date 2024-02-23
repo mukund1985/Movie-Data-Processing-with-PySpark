@@ -4,6 +4,8 @@ from datetime import datetime
 from pyspark.sql import SparkSession, Window
 from pyspark.sql.functions import col, max as max_, min as min_, avg, rank
 
+# Importing necessary modules
+
 # Adjusting the path insert to avoid E501
 path_to_append = '/Users/mukundpandey/git_repo/newday_de_task/src'
 sys.path.insert(0, path_to_append)
@@ -18,6 +20,17 @@ OUTPUT_PATH = os.getenv("OUTPUT_PATH", "output/")
 VERSIONING = datetime.now().strftime("%Y%m%d%H%M%S")
 
 def transform_data(movies_df, ratings_df):
+    """
+    Perform data transformation.
+
+    Args:
+        movies_df (DataFrame): DataFrame containing movie data.
+        ratings_df (DataFrame): DataFrame containing ratings data.
+
+    Returns:
+        movie_ratings (DataFrame): Transformed DataFrame containing movie ratings statistics.
+        top_movies (DataFrame): Transformed DataFrame containing top-rated movies for each user.
+    """
     try:
         logger.info("Starting data transformation.")
         
@@ -42,6 +55,7 @@ def transform_data(movies_df, ratings_df):
         raise
 
 if __name__ == "__main__":
+    # Starting Spark session
     spark = SparkSession.builder.appName("MovieLens Data Processing").getOrCreate()
     logger.info("Spark session started.")
     
@@ -60,14 +74,14 @@ if __name__ == "__main__":
         logger.info("Data read successfully.")
         
         # Debugging schema and data
-        print("Movies DataFrame Schema:")
+        logger.info("Movies DataFrame Schema:")
         movies_df.printSchema()
-        print("Movies DataFrame Sample:")
+        logger.info("Movies DataFrame Sample:")
         movies_df.show(5, truncate=False)
 
-        print("Ratings DataFrame Schema:")
+        logger.info("Ratings DataFrame Schema:")
         ratings_df.printSchema()
-        print("Ratings DataFrame Sample:")
+        logger.info("Ratings DataFrame Sample:")
         ratings_df.show(5, truncate=False)
         
         # Proceed with transformation

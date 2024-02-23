@@ -1,19 +1,47 @@
 from pyspark.sql import SparkSession
 import sys
 import os
-from logging_config import get_logger
+from src.logging_config import get_logger
 
+# Function to get the path for the log file
 def get_log_file_path(data_type):
+    """
+    Get the path for the log file based on the data type.
+
+    Args:
+        data_type (str): Type of data.
+
+    Returns:
+        str: Path for the log file.
+    """
     log_dir = os.getenv("LOG_DIR", "logs/")
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     log_file_name = f"check_parquet_{data_type}.log"
     return os.path.join(log_dir, log_file_name)
 
+# Function to setup logger
 def setup_logger(log_file_path):
+    """
+    Setup logger with specified log file path.
+
+    Args:
+        log_file_path (str): Path for the log file.
+
+    Returns:
+        logger: Configured logger object.
+    """
     return get_logger('check_parquet', log_file=log_file_path)
 
+# Function to read and show Parquet file
 def read_and_show_parquet(file_path, logger):
+    """
+    Read and display contents of a Parquet file.
+
+    Args:
+        file_path (str): Path to the Parquet file.
+        logger: Logger object for logging.
+    """
     spark = SparkSession.builder.appName("Parquet Check Utility").getOrCreate()
     
     try:
