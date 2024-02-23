@@ -1,3 +1,4 @@
+import os
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
@@ -9,6 +10,13 @@ from logging_config import get_logger
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+# Set the path to spark-submit
+spark_submit_path = "/opt/homebrew/bin/spark-submit"
+
+# Set environment variables
+os.environ["SPARK_HOME"] = "/opt/homebrew"  # Optional: Set SPARK_HOME environment variable
+os.environ["PATH"] += os.pathsep + "/opt/homebrew/bin"  # Add spark-submit directory to PATH
 
 # Setup logging for this test module
 logger = get_logger('test_data_processing')
