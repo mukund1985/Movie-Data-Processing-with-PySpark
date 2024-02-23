@@ -10,21 +10,21 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: [3.8]
-
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.8'
 
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
+
+      - name: Install PySpark
+        run: |
+          pip install pyspark
 
       - name: Set up Java
         uses: actions/setup-java@v2
@@ -36,7 +36,6 @@ jobs:
         run: |
           wget -qO- "https://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop2.7.tgz" | tar -xz -C /tmp/
           echo "SPARK_HOME=/tmp/spark-3.1.1-bin-hadoop2.7" >> $GITHUB_ENV
-          echo "$SPARK_HOME/bin" >> $GITHUB_PATH
 
       - name: Debug Python Environment
         run: |
