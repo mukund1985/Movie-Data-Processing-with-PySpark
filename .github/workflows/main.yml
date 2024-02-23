@@ -22,10 +22,6 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Install PySpark
-        run: |
-          pip install pyspark
-
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
@@ -36,15 +32,7 @@ jobs:
         run: |
           wget -qO- "https://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop2.7.tgz" | tar -xz -C /tmp/
           echo "SPARK_HOME=/tmp/spark-3.1.1-bin-hadoop2.7" >> $GITHUB_ENV
-
-      - name: Debug Python Environment
-        run: |
-          echo "Python Version:"
-          python --version
-          echo "Python Path:"
-          python -c "import sys; print(sys.path)"
-          echo "Contents of src directory:"
-          ls -l ${{ github.workspace }}/src
+          echo "$SPARK_HOME/bin" >> $GITHUB_PATH
 
       - name: Run main.py using spark-submit
         env:
