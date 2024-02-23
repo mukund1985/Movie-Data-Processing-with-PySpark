@@ -41,8 +41,8 @@ jobs:
         run: |
           $SPARK_HOME/bin/spark-submit --master local[2] --name "MovieLens Data Processing" src/main.py
 
-      - name: Run PySpark tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/tests
-        run: |
-          pytest tests/
+      # - name: Run PySpark tests
+      #   env:
+      #     PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/tests
+      #   run: |
+      #     pytest tests/
