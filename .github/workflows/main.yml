@@ -72,5 +72,5 @@ jobs:
       # Step to run check_parquet.py script and display logs
       - name: Run check_parquet.py
         run: |
-          python utils/check_parquet.py output/movie_ratings_20240223025843/part-00000-de35fb13-365d-4749-ba6a-9136518dcf0b-c000.snappy.parquet > check_parquet_log.txt
+          python3 utils/check_parquet.py output/movie_ratings_20240223025843/part-00000-de35fb13-365d-4749-ba6a-9136518dcf0b-c000.snappy.parquet > check_parquet_log.txt
           cat check_parquet_log.txt
