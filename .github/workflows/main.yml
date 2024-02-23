@@ -67,7 +67,13 @@ jobs:
           export PYTHONPATH="${{ github.workspace }}/src:${{ github.workspace }}/utils"
 
       # Step to run check_parquet.py script and display logs
-      - name: Run check_parquet.py
+      - name: Find out Movie Ratings
         run: |
           /opt/hostedtoolcache/Python/3.8.18/x64/bin/python3 utils/check_parquet.py output/movie_ratings_20240223025843/part-00000-de35fb13-365d-4749-ba6a-9136518dcf0b-c000.snappy.parquet > check_parquet_log.txt
+          cat check_parquet_log.txt
+
+      # Step to run check_parquet.py script and display logs
+      - name: Find Out Top Movies
+        run: |
+          /opt/hostedtoolcache/Python/3.8.18/x64/bin/python3 utils/check_parquet.py output/top_movies_20240223025843/part-00001-d9605859-f47d-41a5-bb95-fdcf9f0fcab1-c000.snappy.parquet > check_parquet_log.txt
           cat check_parquet_log.txt
