@@ -29,6 +29,11 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      # Step to install PySpark
+      - name: Install PySpark
+        run: |
+          pip install pyspark
+
       # Step to set environment variables for PySpark
       - name: Set environment variables for PySpark
         run: |
